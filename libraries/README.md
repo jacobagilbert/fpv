@@ -3,5 +3,7 @@ This directory contains libraries used by the various projects, both those devel
 
 ## BOSCAM_5G8.lbr
 Eagle library contianing BOSCAM 5.8GHz modules:
+
 1. TX5823 200mW FM Transmitter (pin compatible with 10mW TX5813)
+
 2. RX5808 FM Receiver (identical to RX5880)
