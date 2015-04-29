@@ -23,9 +23,9 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ### Files In Repository:
 
-- 5G8-fpv-tx.sch		Eagle PCB schematic for transmitter board
-- 5G8-fpv-tx.brd		Eagle PCB layout for transmitter board
-- attiny84-transmitter.ino	Arduino sketch for ATTiny84
+- 5G8_fpv_tx.sch		Eagle PCB schematic for transmitter board
+- 5G8_fpv_tx.brd		Eagle PCB layout for transmitter board
+- attiny84_transmitter.ino	Arduino sketch for ATTiny84
 - ZMR250_FPV_TX.zip		Compressed archive of gerber files for board
 
 ### ATTiny 84 Firmware:
