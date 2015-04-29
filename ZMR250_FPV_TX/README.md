@@ -18,7 +18,7 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 **ATTiny Firmware:** I have prototyped the software on a PDIP ATTiny board and the system control is functioning correctly. I have not tested the SPI code yet, but it is borrowed directly from the *rx5808-pro* project.
 
-**Hardware:** Boards were just received from FAB, they have been tested and look good, and I will be populating them and testing them soon. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf).
+**Hardware:** Boards were just received from FAB, they have been tested and look good, and I will be populating them and testing them soon. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf) - $12 for 3 copies. I would not recommend anyone purchase them until I have tested the boards to ensure they work!
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
 ### Files In Repository:
@@ -26,6 +26,7 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 - 5G8-fpv-tx.sch		Eagle PCB schematic for transmitter board
 - 5G8-fpv-tx.brd		Eagle PCB layout for transmitter board
 - attiny84-transmitter.ino	Arduino sketch for ATTiny84
+- ZMR250_FPV_TX.zip		Compressed archive of gerber files for board
 
 ### ATTiny 84 Firmware:
 
