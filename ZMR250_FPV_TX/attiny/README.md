@@ -10,3 +10,9 @@ The ATTiny84 firmware was written in Arduino because it's quick and easy. I'll t
 ### Programming the ATTiny
 
 It is important to note that the ATTiny runs from the same 3.3V supply as the video transmitter, and the VTX will be powered anytime the ATTiny is! Be sure to connect an antenna, or terminate the SMA connector so it is not damaged. The board has a dedicated programming port and current-limiting resistors on MOSI and SCK lines to allow for programming from a 5V arduino device. I don't have a dedicated Atmel programmer, so this is what I do.
+
+### Register Settings
+
+The RTC6705 RFIC has two 20-bit registers that control the frequency synthesizer, 0x00 and 0x01. The 0x00 (Synthesizer Register A) register contains the R-counter divider in the low 15 bits. The 0x01 register contains the N-counter divider in the upper 13 bits and the A-counter divider in the lower 7 bits.
+
+The default R-counter divider value (0x190 = 400d) provides for 40kHz tuning resolution, which is more than sufficient, so it is not changed. The values for the 0x01 register for each channel are pre-calculated and stored in PROGMEM. These values were derived from the equations in the datasheet, I will upload that here also.

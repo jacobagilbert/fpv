@@ -271,6 +271,7 @@ void set_channel_module(uint8_t channel)
   //channelData = channelTable[channel];
   channelData = pgm_read_word_near(channelTable + channel);
 
+  // WHY DO WE EXECUTE A READ BEFORE THE WRITE??
   // bit bash out 25 bits of data
   // Order: A0-3, !R/W, D0-D19
   // A0=0, A1=0, A2=0, A3=1, RW=0, D0-19=0
@@ -297,7 +298,7 @@ void set_channel_module(uint8_t channel)
   SERIAL_ENABLE_LOW();
 
   // Second is the channel data from the lookup table
-  // 20 bytes of register data are sent, but the MSB 4 bits are zeros
+  // 20 bytes of register data are sent
   // register address = 0x1, write, data0-15=channelData data15-19=0x0
   SERIAL_ENABLE_HIGH();
   SERIAL_ENABLE_LOW();
@@ -311,9 +312,9 @@ void set_channel_module(uint8_t channel)
   // Write to register
   SERIAL_SENDBIT1();
 
-  // D0-D15
+  // D0-D19
   //   note: loop runs backwards as more efficent on AVR
-  for (i = 16; i > 0; i--)
+  for (i = 20; i > 0; i--)
   {
     // Is bit high or low?
     if (channelData & 0x1)
@@ -328,10 +329,6 @@ void set_channel_module(uint8_t channel)
     // Shift bits along to check the next one
     channelData >>= 1;
   }
-
-  // Remaining D16-D19
-  for (i = 4; i > 0; i--)
-    SERIAL_SENDBIT0();
 
   // Finished clocking data in
   SERIAL_ENABLE_HIGH();

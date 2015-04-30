@@ -16,7 +16,7 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ### Current Status:
 
-**ATTiny Firmware:** I have prototyped the software on a PDIP ATTiny board and the system control is functioning correctly. I have not tested the SPI code yet, but it is borrowed directly from the *rx5808-pro* project, which does work. The SPI interface to the RX and TX RichWave chips is identical according to the datasheets.
+**ATTiny Firmware:** I have prototyped the software on a PDIP ATTiny board and the system control is functioning correctly. I have not tested the SPI code yet, but it is borrowed directly from the *rx5808-pro* project, which does work. The SPI interface to the RX and TX RichWave chips is identical according to the datasheets, but the frequency registers are not identical. The current code uses the register values for the RX chip, so it *will not work*.
 
 **Hardware:** Boards were just received from FAB, they have been tested and look good, and I will be populating them and testing them soon. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf) - $12 for 3 copies. I would not recommend anyone purchase them until I have tested the boards to ensure they work!
 
