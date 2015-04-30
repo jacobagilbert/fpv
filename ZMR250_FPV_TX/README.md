@@ -2,17 +2,17 @@
 
 ### Origins:
 
-I had a number of annoyances related to the BOSCAM FPV transmitter I initially purchased for my ZRM250 quadcopter. It was difficult to change frequencies, mounting wasn't ideal, and most of all for whatever reason, it only put out 13.1 dBm (~20mW). I knew I was going to need another one, and I happened to stumble across a [German RC forum post](http://fpv-treff.de/viewtopic.php?f=23&t=5974) where an individual had developed their own transmitter based around the TX5823 200mW 5.8GHz transmitter found in many pre-packaged FPV transmitters. While not perfect, it was a great starting point and served as the inspiration for this project.
+I had a number of annoyances related to the BOSCAM FPV transmitter I initially purchased for my ZRM250 quadcopter. It was difficult to change frequencies, mounting wasn't ideal, and most of all for whatever reason, it only put out 13.1 dBm (~20mW). I knew I was going to need another one, and I happened to stumble across a [German RC forum post](http://fpv-treff.de/viewtopic.php?f=23&t=5974) where an awesome guy developed a custom transmitter based around the TX5823 200mW 5.8GHz transmitter found in many pre-packaged FPV transmitters. While not exactly what I wanted, it was a great starting point and served as the inspiration for this project.
 
-There are a number of differences from the original work, specifically the ATTiny software and PCB layout are completely new.
+There are a number of differences from the original work, specifically the ATTiny software and PCB layout are completely new, but they get a ton of credit for all the great stuff in that forum post.
 
 ### Project Objectives:
 
 This project seeks to produce a 200mW FPV transmitter with the following specifications:
 
-- Easily mounted securely on the ZMR250 frame.
+- Easily mounted securely on the ZMR250 frame
 - Simple to change channels (no buried DIP switches!!)
-- Has frequency agility supporting all current receiver channels
+- Has frequency agility supporting all current receiver channels (including IRC's new 'RaceBand'!)
 
 ### Current Status:
 
