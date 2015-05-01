@@ -2,11 +2,11 @@
 
 The ATTiny84 firmware was written in Arduino because it's quick and easy. I'll try to upload a hex file at some point. Programming instructions are based on the [work by HighLowTech](http://highlowtech.org/?p=1695) and are pretty straightforward. A dedicated programming header is located on the board, but that might be removed in future versions since firmware should not need to change very often.
 
-I targeted an ATTiny84 because it fit and they are still relatively inexpensive, and it let me be lazy in programming and layout, and it does not require dual-purposing pins. The sketch will compile for an ATTiny44, and shouldn't be too hard to get into an ATTiny24. Currently the Arduino IDE reports the program size as 2,426 bytes (29% of the ATTiny84).
+I targeted an ATTiny84 because it fit and they are still relatively inexpensive, and it let me be lazy in programming and layout, and it does not require dual-purposing pins. The sketch will compile for an ATTiny44, and shouldn't be too hard to get into an ATTiny24. Currently the Arduino IDE reports the program size as 2,156 bytes (26% of the ATTiny84).
 
 ### Files:
 
-- attiny84_transmitter.ino	Arduino sketch for ATTiny84
+- attiny84_transmitter.ino	Arduino 1.6 sketch for ATTiny84
 - attiny_arduino_1.6.zip	ATTiny support for Arduino 1.6
 - TX_Channel_Calculator.xlsx	Excel spreadsheet for calculating register values
 
@@ -20,4 +20,4 @@ This is what I do to program: connect RST, MOSI, MISO, SCK, and GND from connect
 
 The RTC6705 RFIC has two 20-bit registers that control the frequency synthesizer, 0x00 and 0x01. The 0x00 (Synthesizer Register A) register contains the R-counter divider in the low 15 bits. The 0x01 register contains the N-counter divider in the upper 13 bits and the A-counter divider in the lower 7 bits.
 
-The default R-counter divider value (0x190 = 400d) provides for 40kHz tuning resolution, which is more than sufficient, so it is not changed. The values for the 0x01 register for each channel are pre-calculated and stored in PROGMEM. These values were derived from the equations in the datasheet, I will upload that here also.
+The default R-counter divider value (0x190 = 400d) provides for 40kHz tuning resolution, which is more than sufficient, so it is not changed. The values for the 0x01 register for each channel are pre-calculated and stored in PROGMEM. These values were derived from the equations in the TX_Channel_Calculator spreadsheet.

@@ -4,7 +4,7 @@
 
 I had a number of annoyances related to the BOSCAM FPV transmitter I initially purchased for my ZRM250 quadcopter. It was difficult to change frequencies, mounting wasn't ideal, and most of all for whatever reason, it only put out 13.1 dBm (~20mW). I knew I was going to need another one, and I happened to stumble across a [German RC forum post](http://fpv-treff.de/viewtopic.php?f=23&t=5974) where an awesome guy developed a custom transmitter based around the TX5823 200mW 5.8GHz transmitter found in many pre-packaged FPV transmitters. While not exactly what I wanted, it was a great starting point and served as the inspiration for this project.
 
-There are a number of differences from the original work, specifically the ATTiny software and PCB layout are completely new, but they get a ton of credit for all the great stuff in that forum post.
+There are a number of differences from the original work, specifically the ATTiny software and PCB layout are completely new, but they get a ton of credit for all the great stuff in that forum .
 
 ### Project Objectives:
 
@@ -16,9 +16,9 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ### Current Status:
 
-**ATTiny Firmware:** The current ATTiny firmware has been tested on the hardware platform successfully! There is currently an issue with the EEPROM saving/automatic loading of the previous frequency on powerup, which I need to resolve but the software is very functional.
+**ATTiny Firmware:** The current ATTiny firmware has been tested on the hardware platform successfully! There are no known issues with the current software
 
-**Hardware:** Boards were just received from FAB, they have been tested and populated and function great. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf) - $12 for 3 copies. There are a couple changes I will be making for version 1.1 but they are minor and not functional.
+**Hardware:** Boards were just received from FAB, they have been populated, tested, and function great. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf) - $12 for 3 copies. There are a couple changes I will be making for version 1.1 but they are all relatively minor and do not impact .
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
@@ -26,8 +26,8 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 - 5G8_fpv_tx.sch		Eagle PCB schematic for transmitter board
 - 5G8_fpv_tx.brd		Eagle PCB layout for transmitter board
-- attiny/			ATTiny related files and firmware for board
 - ZMR250_FPV_TX.zip		Compressed archive of gerber files for board
+- attiny/			ATTiny related files and firmware for board
 
 ### Bill of Materials:
 
@@ -39,7 +39,7 @@ It is necessary to modify the TX5823 module so it is able to operate in SPI mode
 
 ![TX5823 Module](pictures/tx5823_SPI_mod.jpg "RX5823 with shield removed")
 
-After removing the resistor, ensure you have not accidentally shorted anything, and replace the shield. This only needs to be done once per module, so you can re-solder the shield to the module PCB.
+After removing the resistor, inspect the board (preferrably under a magnifying glass) to ensure you have not accidentally caused any shorts or displaced any other components; replace the shield. This only needs to be done once so you can re-solder the shield to the module PCB.
 
 ### Mounting Transmitter:
 
@@ -47,7 +47,7 @@ One of the design criteria for this transmitter was mounting to the ZMR250 frame
 
 ![Mounting](pictures/fpv_tx_mounted.jpg "Mounting FPV Transmitter")
 
-On the other end from the SMA connector are two slots that will nicely fit M3 nylon hardware. A spacer is needed to keep some standoff from the conductive frame. I used the smallest diameter HQ propeller mounting bushings since they were a pretty good fit.
+On the other end from the SMA connector are two slots that will nicely fit M3 nylon hardware. A spacer is needed to keep some standoff from the conductive frame. I used the smallest diameter HQ propeller mounting bushings since they were a pretty good fit but I'll probably 3D print some spacers that are sized better.
 
 ### Transmitter Operation
 
@@ -56,10 +56,10 @@ The transmitter will remember the last channel used and will automatically confi
 1. Press and hold the button until the LED turns off and immediately release it. In order to prevent accidental channel changing if you hold it too long, or release it too early it will not set the frequency.
 2. The LED will flash quickly and stop. Press the button to set the band (eg: 3 presses will select band 3, "Band E"). If you press the button more than 5 times (the total number of supported bands), it will loop back to 1.
 3. Wait for the LED to flash quickly again and set the channel using the same procedure as above. There are 8 channels in each band, and pressing more than 8 times will loop back to 1.
-4. Release the button and wait for confirmation that the band has been set (LED long flash, followed by the band, followed by the channel, followed by another long LED flash). The transmitter is now reconfigured and will immediately update the frequency of the module, and will start with the new channel in the future.
+4. Release the button and wait for confirmation that the band has been set (flashes indicating the band, followed by the channel). The transmitter is now reconfigured and will immediately update the frequency of the module, and will start with the new channel in the future.
 5. If the button is not pressed to select the band or channel, the frequency selection mode will exit and flash the LED quickly many times. There will be no change to the current or startup channel.
 
-I am not sure if I like this scheme, but it's a good start that only requires one button and one LED.
+I think I like this scheme but I'm not sure; it might change. Either way, it's a good start that only requires one button and one LED.
 
 ### Video Input Capacitor
 
