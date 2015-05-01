@@ -1,18 +1,18 @@
 // code for transmitter
 #include <EEPROM.h>
+#include <digitalWriteFast.h>
+#include <SPI.h>
+/*using digitalwritefast library cuts time used for port
+manipulations from 7.5us to 0.125us @ 16MHz MCU.
+Which makes most difference in SPI write functions*/
 
-//port manipulation macros
-#define CLR(x,y) (x&=(~(1<<y))) //CLR(PORTB,0) sets pin10 low
-#define SET(x,y) (x|=(1<<y))	//SET(PORTB,0) sets pin10 high
-//using port manipulations cuts time taken in setting pins by 96%
-
-static const uint8_t SPI_ENABLE_PIN = 9;//PB1
-static const uint8_t SPI_CLOCK_PIN = 8;	//PB2
-static const uint8_t SPI_DATA_PIN = 10;	//PB0
-static const uint8_t SWITCH_PIN = 2; 	//PA2
-static const uint8_t LED_PIN = 7;	 	//PA7
-static const uint8_t REMOTE_PIN = 0; 	//PA0
-
+static const uint8_t SPI_ENABLE_PIN = 9;
+static const uint8_t SPI_CLOCK_PIN = 8;
+static const uint8_t SPI_DATA_PIN = 10;
+static const uint8_t SWITCH_PIN = 2;
+static const uint8_t LED_PIN = 7;
+static const uint8_t REMOTE_PIN = 0;
+	
 static const uint8_t EEPROM_ADDR_LAST_FREQ = 0;
 static const uint8_t NUM_BANDS = 5;
 
@@ -42,10 +42,9 @@ void setup() {
   pinModeFast(LED_PIN, OUTPUT);
   pinModeFast(REMOTE_PIN, INPUT_PULLUP);
 
-  CLR(PORTB,2); //CLK low
-  CLR(PORTB,1); //EN low
-  //digitalWrite(SPI_CLOCK_PIN, LOW);
-  //digitalWrite(SPI_ENABLE_PIN, LOW);
+
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_ENABLE_PIN, LOW);
 
   // give transmitter time to power up
   delay(1000);
@@ -76,8 +75,7 @@ void loop() {
     // must hold button for two seconds
     case HOLDOFF:
       if (count > 200) {
-		SET(PORTA,7);
-        //digitalWrite(LED_PIN, HIGH);
+        digitalWriteFast(LED_PIN, HIGH);
         count = 0;
         current_state = RELEASE_TIMER;
       } else {
@@ -85,12 +83,10 @@ void loop() {
           // if just a quick press, flash the frequency
           if (count < 25) {
             current_state = SHOW_FREQ;
-			CLR(PORTA,7);
-            //digitalWrite(LED_PIN, LOW);
+            digitalWriteFast(LED_PIN, LOW);
           } else {
             current_state = WAITING;
-			CLR(PORTA,7);
-            //digitalWrite(LED_PIN, LOW);
+            digitalWriteFast(LED_PIN, LOW);
           }
         }
       }
@@ -105,13 +101,11 @@ void loop() {
     // must release button within 350 ms of LED going off
     case RELEASE_TIMER:
       if (count > 35) {
-		CLR(PORTA,7);
-        //digitalWrite(LED_PIN, LOW);
+        digitalWriteFast(LED_PIN, LOW);
         current_state = WAITING;
       } else {
         if (!switch_read(10)) {
-          CLR(PORTA,7);
-		  //digitalWrite(LED_PIN, LOW);
+          digitalWriteFast(LED_PIN, LOW);
 
           // indicate band-setting mode when released
           delay(500);
@@ -269,11 +263,9 @@ void blink_led(uint16_t ms_on, uint16_t ms_off, uint16_t n_times)
   uint16_t ii;
 
   for (ii=0; ii<n_times; ii++) {
-    SET(PORTA,7);
-	//digitalWrite(LED_PIN, HIGH);
+    digitalWriteFast(LED_PIN, HIGH);
     delay(ms_on);
-	CLR(PORTA,7);
-    //digitalWrite(LED_PIN, LOW);
+    digitalWriteFast(LED_PIN, LOW);
     delay(ms_off);
   }
 }
@@ -294,6 +286,7 @@ void set_5823_freq(uint8_t freq)
 
   // read in the channel information from the table, and add 0x00 04 00 00 to it
   channelData = (pgm_read_word_near(channelTable + freq)) + 0x00040000;
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
 
   SERIAL_ENABLE_LOW();
   SERIAL_ENABLE_HIGH();
@@ -306,6 +299,9 @@ void set_5823_freq(uint8_t freq)
 
   SERIAL_SENDBIT1();  // Write
 
+
+  SPI.transfer(rDividerReg);
+ /*
   for (i = 20; i > 0; i--) {
     if (rDividerReg & 0x01) {
       SERIAL_SENDBIT1();
@@ -314,6 +310,7 @@ void set_5823_freq(uint8_t freq)
     }
     rDividerReg >>= 1;
   }
+*/
 
   SERIAL_ENABLE_HIGH();
   SERIAL_ENABLE_LOW();
@@ -324,7 +321,10 @@ void set_5823_freq(uint8_t freq)
   SERIAL_SENDBIT0();
 
   SERIAL_SENDBIT1();  // Write
-
+  
+  
+  SPI.transfer(channelData);
+  /*
   for (i = 20; i > 0; i--) {
     if (channelData & 0x01) {
       SERIAL_SENDBIT1();
@@ -333,45 +333,43 @@ void set_5823_freq(uint8_t freq)
     }
     channelData >>= 1;
   }
-
-  SERIAL_ENABLE_HIGH();
-  CLR(PORTB,1);
-  CLR(PORTB,2);
-  CLR(PORTB,0);
-  /*
-  digitalWrite(SPI_ENABLE_PIN, LOW);
-  digitalWrite(SPI_CLOCK_PIN, LOW);
-  digitalWrite(SPI_DATA_PIN, LOW);
   */
+  SPI.endTransaction();
+  
+  SERIAL_ENABLE_HIGH();
+
+  digitalWriteFast(SPI_ENABLE_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_DATA_PIN, LOW);
 }
 
 
 void SERIAL_SENDBIT1()
 {
-  CLR(PORTB,2); //digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 
-  SET(PORTB,0); //digitalWrite(SPI_DATA_PIN, HIGH);
+  digitalWriteFast(SPI_DATA_PIN, HIGH);
   delayMicroseconds(1);
-  SET(PORTB,2); //digitalWrite(SPI_CLOCK_PIN, HIGH);
+  digitalWriteFast(SPI_CLOCK_PIN, HIGH);
   delayMicroseconds(1);
 
-  CLR(PORTB,2); //digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 }
 
 
 void SERIAL_SENDBIT0()
 {
-  CLR(PORTB,2); //digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 
-  CLR(PORTB,0); //digitalWrite(SPI_DATA_PIN, LOW);
+  digitalWriteFast(SPI_DATA_PIN, LOW);
   delayMicroseconds(1);
-  SET(PORTB,2); //digitalWrite(SPI_CLOCK_PIN, HIGH);
+  digitalWriteFast(SPI_CLOCK_PIN, HIGH);
   delayMicroseconds(1);
-  
-  CLR(PORTB,2); //digitalWrite(SPI_CLOCK_PIN, LOW);
+
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 }
 
@@ -379,7 +377,7 @@ void SERIAL_SENDBIT0()
 void SERIAL_ENABLE_LOW()
 {
   delayMicroseconds(1);
-  CLR(PORTB,1); //digitalWrite(SPI_ENABLE_PIN, LOW);
+  digitalWriteFast(SPI_ENABLE_PIN, LOW);
   delayMicroseconds(1);
 }
 
@@ -387,6 +385,6 @@ void SERIAL_ENABLE_LOW()
 void SERIAL_ENABLE_HIGH()
 {
   delayMicroseconds(1);
-  SET(PORTB,1); //digitalWrite(SPI_ENABLE_PIN, HIGH);
+  digitalWriteFast(SPI_ENABLE_PIN, HIGH);
   delayMicroseconds(1);
 }
