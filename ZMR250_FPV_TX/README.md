@@ -37,6 +37,14 @@ It is necessary to modify the TX5823 module so it is able to operate in SPI mode
 
 After removing the resistor, ensure you have not accidentally shorted anything, and replace the shield. This only needs to be done once per module, so you can re-solder the shield to the module PCB.
 
+### Mounting Transmitter:
+
+One of the design criteria for this transmitter was mounting to the ZMR250 frame. Consistant with that, it has been designed to mount cleanly to the rear of the top plate, though the hole in the rear must be drilled out to 1/4" to accomodate the SMA connector. By mounting the SMA connector directly to the frame, it is very unlikely that a crash will destroy the transmitter.
+
+![Mounting](pictures/fpv_tx_mounted.jpg "Mounting FPV Transmitter")
+
+On the other end from the SMA connector are two slots that will nicely fit M3 nylon hardware. A spacer is needed to keep some standoff from the conductive frame. I used the smallest diameter HQ propeller mounting bushings since they were a pretty good fit.
+
 ### Transmitter Operation
 
 The transmitter will remember the last channel used and will automatically configure to this channel on startup. To view the current frequency, you can push the button once quickly and the LED will flash the current band (1-5) followed by a brief pause, followed by the current channel (1-8). To change the frequency, the following procedure should be used:
