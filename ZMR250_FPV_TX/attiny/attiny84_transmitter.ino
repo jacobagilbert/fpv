@@ -9,25 +9,26 @@ static const uint8_t LED_PIN = 7;
 static const uint8_t REMOTE_PIN = 0;
 
 static const uint8_t EEPROM_ADDR_LAST_FREQ = 0;
+static const uint8_t NUM_BANDS = 5;
 
+/* These frequencies are for RichWave transmitters - this table is the lower 16 bits - upper byte is 0x04 */
 const uint16_t channelTable[] PROGMEM = {
-  // Channel 1 - 8
-  0x2A05,    0x299B,    0x2991,    0x2987,    0x291D,    0x2913,    0x2909,    0x289F,    // Band A
-  0x2903,    0x290C,    0x2916,    0x291F,    0x2989,    0x2992,    0x299C,    0x2A05,    // Band B
-  0x2895,    0x288B,    0x2881,    0x2817,    0x2A0F,    0x2A19,    0x2A83,    0x2A8D,    // Band E
-  0x2906,    0x2910,    0x291A,    0x2984,    0x298E,    0x2998,    0x2A02,    0x2A0C,    // Band F / Airwave
-  0x281D,    0x288F,    0x2902,    0x2914,    0x2978,    0x2999,    0x2A0C,    0x2A1E     // Band R / IRC Raceband
+  0x7981,    0x758D,    0x7199,    0x6DA5,    0x69B1,    0x65BD,    0x6209,    0x5E15,    // Band A
+  0x5F9D,    0x6338,    0x6713,    0x6AAE,    0x6E89,    0x7224,    0x75BF,    0x799A,    // Band B
+  0x5A21,    0x562D,    0x5239,    0x4E85,    0x7D35,    0x8129,    0x851D,    0x8911,    // Band E
+  0x610C,    0x6500,    0x68B4,    0x6CA8,    0x709C,    0x7490,    0x7884,    0x7C38,    // Band F / Airwave
+  0x510A,    0x5827,    0x5F84,    0x66A1,    0x6DBE,    0x751B,    0x7C38,    0x8395     // Band R / IRC Raceband
 };
 
 enum STATE { WAITING, HOLDOFF, SHOW_FREQ, RELEASE_TIMER, BAND_COUNTING, CHANNEL_SET, CHANNEL_COUNTING, SET_FREQ };
 STATE current_state;
-uint16_t current_freq;
+uint8_t current_freq;
 
 uint16_t count;
 uint8_t previous_val, band, channel;
 
 void setup() {
-  
+ 
   // set pin directions
   pinMode(SPI_ENABLE_PIN, OUTPUT);
   pinMode(SPI_CLOCK_PIN, OUTPUT);
@@ -36,12 +37,15 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   pinMode(REMOTE_PIN, INPUT_PULLUP);
   
+  digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWrite(SPI_ENABLE_PIN, LOW);
+  
   // give transmitter time to power up
-  delay(100);
+  delay(1000);
   
   // read previous channel and set module
   current_freq = EEPROM.read(EEPROM_ADDR_LAST_FREQ) & 0x3f;  // mask by 0b0011.1111 = 0b xx xx B2 B1 . B0 C2 C1 C0
-  set_channel_module(current_freq);
+  set_5823_freq(current_freq);
   
   //flash current frequency to user on boot
   flash_freq(current_freq);
@@ -115,9 +119,9 @@ void loop() {
           blink_led(20,0,1);
           count = 0;    // reset the counter if button was pressed
           band++;
-          // only 5 possible bands, reset if too many presses
-          if (band > 5) {
-            band -= 5;
+          // not all bands are valid, loop back around if too many presses
+          if (band > NUM_BANDS) {  
+            band -= NUM_BANDS;
             delay(100);
             blink_led(20,0,1);
           }
@@ -139,7 +143,7 @@ void loop() {
           previous_val = 0;
           current_state = CHANNEL_COUNTING;
         } else {
-          blink_led(25, 25, 10);
+          blink_led(25, 25, 16);  // ERROR
           current_state = WAITING;
         }
       }
@@ -179,11 +183,10 @@ void loop() {
       if (count >= 200) {
         // if band is still zero, flash error sequence and go back to start
         if (channel > 0) {
-          //blink_led(100, 100, channel);
           delay(500);
           current_state = SET_FREQ;
         } else {
-          blink_led(25, 25, 10);
+          blink_led(25, 25, 16);  // ERROR
           current_state = WAITING;
         }
       }
@@ -196,7 +199,7 @@ void loop() {
       EEPROM.write(EEPROM_ADDR_LAST_FREQ, current_freq);
       
       // set the current frequency of the module
-      set_channel_module(current_freq);
+      set_5823_freq(current_freq);
       
       // display the frequency to the user
       delay(1000);
@@ -222,7 +225,7 @@ void loop() {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 byte switch_read(uint16_t time)
-//accepts configurable debounce time, favor unpressed ('1' due to internal pullup)
+// accepts configurable debounce time, favor unpressed ('1' due to internal pullup)
 {
   if (digitalRead(SWITCH_PIN) == 0) {
     delay(time);
@@ -262,79 +265,63 @@ void blink_led(uint16_t ms_on, uint16_t ms_off, uint16_t n_times)
 }
 
 
-void set_channel_module(uint8_t channel)
+void set_5823_freq(uint8_t freq)
 {
   uint8_t i;
-  uint16_t channelData;
+  uint32_t channelData, rDividerReg;
+  
+  // from datasheet, set R-divider to 400d
+  rDividerReg=0x190;
+  
+  if ((((freq >> 3) & 0x07) + 1) > NUM_BANDS) {
+    blink_led(25, 25, 16);  // ERROR
+    return;
+  }
 
-  //channelData = pgm_read_word(&channelTable[channel]);
-  //channelData = channelTable[channel];
-  channelData = pgm_read_word_near(channelTable + channel);
+  // read in the channel information from the table, and add 0x00 04 00 00 to it
+  channelData = (pgm_read_word_near(channelTable + freq)) + 0x00040000;
 
-  // WHY DO WE EXECUTE A READ BEFORE THE WRITE??
-  // bit bash out 25 bits of data
-  // Order: A0-3, !R/W, D0-D19
-  // A0=0, A1=0, A2=0, A3=1, RW=0, D0-19=0
-  SERIAL_ENABLE_HIGH();
-  delayMicroseconds(1);  
-  //delay(2);
   SERIAL_ENABLE_LOW();
-
-  SERIAL_SENDBIT0();
-  SERIAL_SENDBIT0();
-  SERIAL_SENDBIT0();
-  SERIAL_SENDBIT1();
-
-  SERIAL_SENDBIT0();
-
-  // remaining zeros
-  for (i = 20; i > 0; i--)
-    SERIAL_SENDBIT0();
-
-  // Clock the data in
-  SERIAL_ENABLE_HIGH();
-  //delay(2);
-  delayMicroseconds(1);  
-  SERIAL_ENABLE_LOW();
-
-  // Second is the channel data from the lookup table
-  // 20 bytes of register data are sent
-  // register address = 0x1, write, data0-15=channelData data15-19=0x0
   SERIAL_ENABLE_HIGH();
   SERIAL_ENABLE_LOW();
-
-  // Register 0x1
-  SERIAL_SENDBIT1();
+  
+  SERIAL_SENDBIT0();  // addr = 0x00
   SERIAL_SENDBIT0();
   SERIAL_SENDBIT0();
   SERIAL_SENDBIT0();
-
-  // Write to register
-  SERIAL_SENDBIT1();
-
-  // D0-D19
-  //   note: loop runs backwards as more efficent on AVR
-  for (i = 20; i > 0; i--)
-  {
-    // Is bit high or low?
-    if (channelData & 0x1)
-    {
+  
+  SERIAL_SENDBIT1();  // Write
+  
+  for (i = 20; i > 0; i--) {
+    if (rDividerReg & 0x01) {
       SERIAL_SENDBIT1();
-    }
-    else
-    {
+    } else {
       SERIAL_SENDBIT0();
     }
-
-    // Shift bits along to check the next one
+    rDividerReg >>= 1;
+  }
+  
+  SERIAL_ENABLE_HIGH();
+  SERIAL_ENABLE_LOW();
+  
+  SERIAL_SENDBIT1();  // addr = 0x01
+  SERIAL_SENDBIT0();
+  SERIAL_SENDBIT0();
+  SERIAL_SENDBIT0();
+  
+  SERIAL_SENDBIT1();  // Write
+  
+  for (i = 20; i > 0; i--) {
+    if (channelData & 0x01) {
+      SERIAL_SENDBIT1();
+    } else {
+      SERIAL_SENDBIT0();
+    }
     channelData >>= 1;
   }
 
-  // Finished clocking data in
   SERIAL_ENABLE_HIGH();
-  delayMicroseconds(1);
-  //delay(2);
-
+  
   digitalWrite(SPI_ENABLE_PIN, LOW);
   digitalWrite(SPI_CLOCK_PIN, LOW);
   digitalWrite(SPI_DATA_PIN, LOW);
