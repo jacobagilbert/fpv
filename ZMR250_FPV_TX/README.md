@@ -29,7 +29,11 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 - attiny/			ATTiny related files and firmware for board
 - ZMR250_FPV_TX.zip		Compressed archive of gerber files for board
 
-### RX5823 Module Modifications
+### Bill of Materials:
+
+First, I apologize this is not here yet. There are only a handful of components, but the large capacitors are all 7343 size tantalum, the Pololu module is a 500mA 3.3V SMPS module, R1 is 330 ohm and R2-R4 are 3.3k. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have 'em use 0603 for bypass capacitor and resistors).
+
+### RX5823 Module Modifications:
 
 It is necessary to modify the TX5823 module so it is able to operate in SPI mode. The modification only require the removal of a single resistor, however it is under the metal shield on the module, so you will need to remove that first. The easiest way to do that is to work one side at a time (they are soldered on two sides) with a soldering iron and precision slotted screwdriver. Use the screwdriver between the module board and shield to *gently* apply pressure while melting the solder. If you work carefully, alternating sides, and taking breaks to allow the module to cool down it is fairly easy to remove the shield. Clean up any excess solder, and remove the resistor shown in the following image:
 
