@@ -1,5 +1,9 @@
 // code for transmitter
 #include <EEPROM.h>
+#include <digitalWriteFast.h>
+/*using digitalwritefast library cuts time used for port
+manipulations from 7.5us to 0.125us @ 16MHz MCU.
+Which makes most difference in SPI write functions*/
 
 static const uint8_t SPI_ENABLE_PIN = 9;
 static const uint8_t SPI_CLOCK_PIN = 8;
@@ -7,7 +11,7 @@ static const uint8_t SPI_DATA_PIN = 10;
 static const uint8_t SWITCH_PIN = 2;
 static const uint8_t LED_PIN = 7;
 static const uint8_t REMOTE_PIN = 0;
-
+	
 static const uint8_t EEPROM_ADDR_LAST_FREQ = 0;
 static const uint8_t NUM_BANDS = 5;
 
@@ -28,48 +32,49 @@ uint16_t count;
 uint8_t previous_val, band, channel;
 
 void setup() {
- 
+
   // set pin directions
-  pinMode(SPI_ENABLE_PIN, OUTPUT);
-  pinMode(SPI_CLOCK_PIN, OUTPUT);
-  pinMode(SPI_DATA_PIN, OUTPUT);
-  pinMode(SWITCH_PIN, INPUT_PULLUP);
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(REMOTE_PIN, INPUT_PULLUP);
-  
-  digitalWrite(SPI_CLOCK_PIN, LOW);
-  digitalWrite(SPI_ENABLE_PIN, LOW);
-  
+  pinModeFast(SPI_ENABLE_PIN, OUTPUT);
+  pinModeFast(SPI_CLOCK_PIN, OUTPUT);
+  pinModeFast(SPI_DATA_PIN, OUTPUT);
+  pinModeFast(SWITCH_PIN, INPUT_PULLUP);
+  pinModeFast(LED_PIN, OUTPUT);
+  pinModeFast(REMOTE_PIN, INPUT_PULLUP);
+
+
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_ENABLE_PIN, LOW);
+
   // give transmitter time to power up
   delay(1000);
-  
+
   // read previous channel and set module
   current_freq = EEPROM.read(EEPROM_ADDR_LAST_FREQ) & 0x3f;  // mask by 0b0011.1111 = 0b xx xx B2 B1 . B0 C2 C1 C0
   set_5823_freq(current_freq);
-  
+
   //flash current frequency to user on boot
   flash_freq(current_freq);
-  
+
   current_state = WAITING;
 }
 
 void loop() {
-  
+
   // we don't need to do ANYTHING unless input changes
 
   switch (current_state) {
-    
+
     case WAITING:
       if (switch_read(10)) {
         current_state = HOLDOFF;
         count = 0;
       }
       break;
-    
+
     // must hold button for two seconds
     case HOLDOFF:
       if (count > 200) {
-        digitalWrite(LED_PIN, HIGH);
+        digitalWriteFast(LED_PIN, HIGH);
         count = 0;
         current_state = RELEASE_TIMER;
       } else {
@@ -77,30 +82,30 @@ void loop() {
           // if just a quick press, flash the frequency
           if (count < 25) {
             current_state = SHOW_FREQ;
-            digitalWrite(LED_PIN, LOW);
+            digitalWriteFast(LED_PIN, LOW);
           } else {
             current_state = WAITING;
-            digitalWrite(LED_PIN, LOW);
+            digitalWriteFast(LED_PIN, LOW);
           }
         }
       }
       count++;
       break;
-    
+
     case SHOW_FREQ:
       flash_freq(current_freq);
       current_state = WAITING;
       break;
-    
+
     // must release button within 350 ms of LED going off
     case RELEASE_TIMER:
       if (count > 35) {
-        digitalWrite(LED_PIN, LOW);
+        digitalWriteFast(LED_PIN, LOW);
         current_state = WAITING;
       } else {
         if (!switch_read(10)) {
-          digitalWrite(LED_PIN, LOW);
-          
+          digitalWriteFast(LED_PIN, LOW);
+
           // indicate band-setting mode when released
           delay(500);
           blink_led(25,75,5);
@@ -112,7 +117,7 @@ void loop() {
       }
       count++;
       break;
-    
+
     case BAND_COUNTING:
       if (switch_read(10)) {
         if (previous_val == 0) {
@@ -120,7 +125,7 @@ void loop() {
           count = 0;    // reset the counter if button was pressed
           band++;
           // not all bands are valid, loop back around if too many presses
-          if (band > NUM_BANDS) {  
+          if (band > NUM_BANDS) {
             band -= NUM_BANDS;
             delay(100);
             blink_led(20,0,1);
@@ -148,7 +153,7 @@ void loop() {
         }
       }
       break;
-    
+
     case CHANNEL_SET:
       if (!switch_read(10)) {
         // indicate band-setting mode when released
@@ -160,7 +165,7 @@ void loop() {
         previous_val = 0;
       }
       break;
-    
+
     case CHANNEL_COUNTING:
       if (switch_read(10)) {
         if (previous_val == 0) {
@@ -191,16 +196,16 @@ void loop() {
         }
       }
       break;
-    
+
     case SET_FREQ:
       current_freq = (band - 1) * 8 + (channel - 1);
-      
+
       // save current freq to EEPROM
       EEPROM.write(EEPROM_ADDR_LAST_FREQ, current_freq);
-      
+
       // set the current frequency of the module
       set_5823_freq(current_freq);
-      
+
       // display the frequency to the user
       delay(1000);
       blink_led(500,0,1);
@@ -208,10 +213,10 @@ void loop() {
       flash_freq(current_freq);
       delay(1000);
       blink_led(500,0,1);
-      
+
       current_state = WAITING;
       break;
-      
+
     default:
       current_state = WAITING;
       break;
@@ -242,10 +247,10 @@ byte switch_read(uint16_t time)
 void flash_freq(uint8_t freq)
 {
   uint8_t band, channel;
-  
+
   band = (freq >> 3) + 1;         // band is the band/8 + 1
   channel = (freq & 0x07) + 1;   // channel is lowest 3 bytes + 1
-  
+
   blink_led(100,200,band);
   delay(1000);
   blink_led(100,200,channel);
@@ -255,13 +260,13 @@ void flash_freq(uint8_t freq)
 void blink_led(uint16_t ms_on, uint16_t ms_off, uint16_t n_times)
 {
   uint16_t ii;
-  
+
   for (ii=0; ii<n_times; ii++) {
-    digitalWrite(LED_PIN, HIGH);
+    digitalWriteFast(LED_PIN, HIGH);
     delay(ms_on);
-    digitalWrite(LED_PIN, LOW);
+    digitalWriteFast(LED_PIN, LOW);
     delay(ms_off);
-  }  
+  }
 }
 
 
@@ -269,10 +274,10 @@ void set_5823_freq(uint8_t freq)
 {
   uint8_t i;
   uint32_t channelData, rDividerReg;
-  
+
   // from datasheet, set R-divider to 400d
   rDividerReg=0x190;
-  
+
   if ((((freq >> 3) & 0x07) + 1) > NUM_BANDS) {
     blink_led(25, 25, 16);  // ERROR
     return;
@@ -284,14 +289,14 @@ void set_5823_freq(uint8_t freq)
   SERIAL_ENABLE_LOW();
   SERIAL_ENABLE_HIGH();
   SERIAL_ENABLE_LOW();
-  
+
   SERIAL_SENDBIT0();  // addr = 0x00
   SERIAL_SENDBIT0();
   SERIAL_SENDBIT0();
   SERIAL_SENDBIT0();
-  
+
   SERIAL_SENDBIT1();  // Write
-  
+
   for (i = 20; i > 0; i--) {
     if (rDividerReg & 0x01) {
       SERIAL_SENDBIT1();
@@ -300,17 +305,17 @@ void set_5823_freq(uint8_t freq)
     }
     rDividerReg >>= 1;
   }
-  
+
   SERIAL_ENABLE_HIGH();
   SERIAL_ENABLE_LOW();
-  
+
   SERIAL_SENDBIT1();  // addr = 0x01
   SERIAL_SENDBIT0();
   SERIAL_SENDBIT0();
   SERIAL_SENDBIT0();
-  
+
   SERIAL_SENDBIT1();  // Write
-  
+
   for (i = 20; i > 0; i--) {
     if (channelData & 0x01) {
       SERIAL_SENDBIT1();
@@ -321,39 +326,39 @@ void set_5823_freq(uint8_t freq)
   }
 
   SERIAL_ENABLE_HIGH();
-  
-  digitalWrite(SPI_ENABLE_PIN, LOW);
-  digitalWrite(SPI_CLOCK_PIN, LOW);
-  digitalWrite(SPI_DATA_PIN, LOW);
+
+  digitalWriteFast(SPI_ENABLE_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_DATA_PIN, LOW);
 }
 
 
 void SERIAL_SENDBIT1()
 {
-  digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 
-  digitalWrite(SPI_DATA_PIN, HIGH);
+  digitalWriteFast(SPI_DATA_PIN, HIGH);
   delayMicroseconds(1);
-  digitalWrite(SPI_CLOCK_PIN, HIGH);
+  digitalWriteFast(SPI_CLOCK_PIN, HIGH);
   delayMicroseconds(1);
 
-  digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 }
 
 
 void SERIAL_SENDBIT0()
 {
-  digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 
-  digitalWrite(SPI_DATA_PIN, LOW);
+  digitalWriteFast(SPI_DATA_PIN, LOW);
   delayMicroseconds(1);
-  digitalWrite(SPI_CLOCK_PIN, HIGH);
+  digitalWriteFast(SPI_CLOCK_PIN, HIGH);
   delayMicroseconds(1);
 
-  digitalWrite(SPI_CLOCK_PIN, LOW);
+  digitalWriteFast(SPI_CLOCK_PIN, LOW);
   delayMicroseconds(1);
 }
 
@@ -361,7 +366,7 @@ void SERIAL_SENDBIT0()
 void SERIAL_ENABLE_LOW()
 {
   delayMicroseconds(1);
-  digitalWrite(SPI_ENABLE_PIN, LOW);
+  digitalWriteFast(SPI_ENABLE_PIN, LOW);
   delayMicroseconds(1);
 }
 
@@ -369,6 +374,6 @@ void SERIAL_ENABLE_LOW()
 void SERIAL_ENABLE_HIGH()
 {
   delayMicroseconds(1);
-  digitalWrite(SPI_ENABLE_PIN, HIGH);
+  digitalWriteFast(SPI_ENABLE_PIN, HIGH);
   delayMicroseconds(1);
 }
