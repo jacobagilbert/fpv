@@ -22,6 +22,8 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
+**Video Quality:** One board I built up looks pretty good, maybe slightly less good than the BOSCAM transmitter I have but great. However, I have recently built up the two other units I planned on and observed quite bad interference coming from the 3.3V regulator. I have added 1uf SMT capacitors on the Pololu output pins and the TX5823 power input pins to help, however this did not completely resolve the issue. I suspect this may be due to the power line running underneath the module so if anyone would like to test this by cutting the power trace and green-wiring it that would be great. 
+
 ### Files In Repository:
 
 - 5G8_fpv_tx.sch		Eagle PCB schematic for transmitter board
@@ -66,3 +68,5 @@ I think I like this scheme but I'm not sure; it might change. Either way, it's a
 The TX5823 module specifies a 470uF capacitor on the video input line. These are rather expensive, and I'm not sure it is strictly necessary so I added pads that can be solder-jumpered to bypass the capacitor. This is hilighted below, I will test both ways and update this with that information.
 
 ![Video Capacitor Detail](pictures/video_capacitor.png "Video Capacitor Detail")
+
+So I have tested with and without the capacitor, and it does not seem to matter. Unfortunately the boards I am building up have other noise issues (see above) making testing difficult, but it doesn't seem to make any difference. It would be good to include it but if cost is an issue, it can be left out.
