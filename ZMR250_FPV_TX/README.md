@@ -22,13 +22,16 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
-**Video Quality:** One board I built up looks pretty good, maybe slightly less good than the BOSCAM transmitter I have but great. However, I have recently built up the two other units I planned on and observed quite bad interference coming from the 3.3V regulator. I have added 1uf SMT capacitors on the Pololu output pins and the TX5823 power input pins to help, however this did not completely resolve the issue. I suspect this may be due to the power line running underneath the module so if anyone would like to test this by cutting the power trace and green-wiring it that would be great. 
+**Video Quality:** One board I built up looks pretty good, maybe slightly less good than the BOSCAM transmitter I have but great. However, I have recently built up the two other units I planned on and observed quite bad interference coming from the 3.3V regulator. I have added 1uf SMT capacitors on the Pololu output pins and the TX5823 power input pins to help, however this did not completely resolve the issue. I suspect this may be due to the power line running underneath the module so if anyone would like to test this by cutting the power trace and green-wiring it that would be great.
+
+UPDATE: I have confirmed this is due to power supply noise from the 3.3V regulator. Fix is not clear at this point, but I am inclined to replace the 3.3V Pololu module with a 5V module (or modify to output ~3.7V and add a >400mA LDO to 3.3V. Also possible would be to power the VTX from a separate battery. I apologize to anyone who has already ordered boards. 
 
 ### Files In Repository:
 
 - 5G8_fpv_tx.sch		Eagle PCB schematic for transmitter board
 - 5G8_fpv_tx.brd		Eagle PCB layout for transmitter board
 - ZMR250_FPV_TX.zip		Compressed archive of gerber files for board
+- FPV_TX_BOM.xlsx		Bill of materials to populate boards
 - attiny/			ATTiny related files and firmware for board
 
 ### Bill of Materials:
