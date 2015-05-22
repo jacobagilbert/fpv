@@ -1,4 +1,4 @@
-# Custom FPV Transmitter for ZMR250
+# Custom FPV Transmitter for ZMR250: The ZTX-23
 
 ### Origins:
 
@@ -16,15 +16,27 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ### Current Status:
 
-**ATTiny Firmware:** The current ATTiny firmware has been tested on the hardware platform successfully! There are no known issues with the current software
+**ATTiny Firmware:** The current ATTiny firmware has been tested on the hardware platform successfully! There are no known issues with the current software. I have used it many times and overall I am quite pleased. I decreased the startup delay from 1000 to 100 ms recently which speeds up start.
 
-**Hardware:** Boards were just received from FAB, they have been populated, tested, and function great. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf) - $12 for 3 copies. There are a couple changes I will be making for version 1.1 but they are all relatively minor and do not impact .
+**Hardware:** Boards were just received from FAB, they have been populated, tested, and function great. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf) - $12 for 3 copies. There are a couple changes I will be making for version 1.1 but they are all relatively minor and do not impact . **UPDATE** There are new boards that address the video noise issues that will be available soon. I have ordered an initial set and will update when I test them.
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
+**Weight:** While reducing weight was not a project objective, 250 racers and their pilots are weight-sensitive. I made some measurements and here is where this board falls in:
+
+| Hardware     | Weight   | Comments                         |
+|--------------|----------|----------------------------------|
+|BOSCAM TS351  |23.7g     |Transmitter only, no mounting     |
+|SMA Extension |7g        |30.7g with BOSCAM and no mounting |
+|ZTX-23        |**13.3g** |Includes all mounting and cables! |
+
+So this transmitter is not the lightest weight transmitter out there, but considering this includes all material required to securely install the transmitter to the frame, I am very pleased.
+
 **Video Quality:** One board I built up looks pretty good, maybe slightly less good than the BOSCAM transmitter I have but great. However, I have recently built up the two other units I planned on and observed quite bad interference coming from the 3.3V regulator. I have added 1uf SMT capacitors on the Pololu output pins and the TX5823 power input pins to help, however this did not completely resolve the issue. I suspect this may be due to the power line running underneath the module so if anyone would like to test this by cutting the power trace and green-wiring it that would be great.
 
-UPDATE: I have confirmed this is due to power supply noise from the 3.3V regulator. Fix is not clear at this point, but I am inclined to replace the 3.3V Pololu module with a 5V module (or modify to output ~3.7V and add a >400mA LDO to 3.3V. Also possible would be to power the VTX from a separate battery. I apologize to anyone who has already ordered boards. 
+UPDATE: I have confirmed this is due to power supply noise from the 3.3V regulator. Fix is not clear at this point, but I am inclined to replace the 3.3V Pololu module with a 5V module (or modify to output ~3.7V and add a >400mA LDO to 3.3V. Also possible would be to power the VTX from a separate battery. I apologize to anyone who has already ordered boards.
+
+UPDATE2: I have solved the issue on one board by installing a 3.3V LDO inline with the Pololu output, and increasing the Pololu regulator to ~3.9V by installing a 100k resistor in parallel with the base voltage set resistor. It works great now! I am having a second round of boards made with this incorporated onto the board and a few other changes.
 
 ### Files In Repository:
 
@@ -36,7 +48,7 @@ UPDATE: I have confirmed this is due to power supply noise from the 3.3V regulat
 
 ### Bill of Materials:
 
-First, I apologize this is not here yet. There are only a handful of components, but the large capacitors are all 7343 size tantalum, the Pololu module is a 500mA 3.3V SMPS module, R1 is 330 ohm and R2-R4 are 3.3k. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have 'em use 0603 for bypass capacitor and resistors).
+BOM is up. There are only a handful of components, but the large capacitors are all 7343 size tantalum, the Pololu module is a 500mA 3.3V SMPS module, R1 is 330 ohm and R2-R4 are 3.3k. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have 'em use 0603 for bypass capacitor and resistors).
 
 ### RX5823 Module Modifications:
 
@@ -48,11 +60,11 @@ After removing the resistor, inspect the board (preferrably under a magnifying g
 
 ### Mounting Transmitter:
 
-One of the design criteria for this transmitter was mounting to the ZMR250 frame. Consistant with that, it has been designed to mount cleanly to the rear of the top plate, though the hole in the rear must be drilled out to 1/4" to accomodate the SMA connector. By mounting the SMA connector directly to the frame, it is very unlikely that a crash will destroy the transmitter.
+One of the design criteria for this transmitter was mounting to the ZMR250 frame. Consistant with that, it has been designed to mount cleanly to the rear of the top plate, though the hole in the rear must be drilled out with a 0.25" bit to accomodate the SMA connector. By mounting the SMA connector directly to the frame, it is very unlikely that a crash will destroy the transmitter. Be careful drilling carbon fiber as it can be a little tricky, and don't inhale the dust!
 
 ![Mounting](pictures/fpv_tx_mounted.jpg "Mounting FPV Transmitter")
 
-On the other end from the SMA connector are two slots that will nicely fit M3 nylon hardware. A spacer is needed to keep some standoff from the conductive frame. I used the smallest diameter HQ propeller mounting bushings since they were a pretty good fit but I'll probably 3D print some spacers that are sized better.
+On the other end from the SMA connector are two slots that will nicely fit M3 nylon hardware. A spacer is needed to keep some standoff from the conductive frame. I used the smallest diameter HQ propeller mounting bushings since they were a pretty good fit but I'll probably 3D print some spacers that are sized better and post the files when I am happy.
 
 ### Transmitter Operation
 
