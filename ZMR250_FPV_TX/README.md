@@ -26,9 +26,10 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 | Hardware     | Weight   | Comments                         |
 |--------------|----------|----------------------------------|
-|BOSCAM TS351  |23.7g     |Transmitter only, no mounting     |
-|SMA Extension |7g        |30.7g with BOSCAM and no mounting |
+|BOSCAM TS351  |23.7g     |Transmitter only, no mounting     |        <-- what I used to have
+|TS5823        |8g        |Transmitter only, no mounting     |
 |ZTX-23        |**13.3g** |Includes all mounting and cables! |
+|SMA Extension |7g        |30.7g with BOSCAM and no mounting |
 
 So this transmitter is not the lightest weight transmitter out there, but considering this includes all material required to securely install the transmitter to the frame, I am very pleased.
 
