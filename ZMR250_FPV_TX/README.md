@@ -22,11 +22,11 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
-**Weight:** While reducing weight was not a project objective, 250 racers and their pilots are weight-sensitive. I made some measurements and here is where this board falls in:
+**Weight:** While reducing weight was not a project objective, 250 racers and their pilots are weight-sensitive. I made some measurements and here is where this board falls in. I was using a TS351 in a neat 3D printed holder, but it was pretty heavy:
 
 | Hardware     | Weight   | Comments                         |
 |--------------|----------|----------------------------------|
-|BOSCAM TS351  |23.7g     |Transmitter only, no mounting     |        <-- what I used to have
+|BOSCAM TS351  |23.7g     |Transmitter only, no mounting     |
 |TS5823        |8g        |Transmitter only, no mounting     |
 |ZTX-23        |**13.3g** |Includes all mounting and cables! |
 |SMA Extension |7g        |30.7g with BOSCAM and no mounting |
