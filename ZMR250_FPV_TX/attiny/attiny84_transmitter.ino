@@ -81,7 +81,7 @@ void setup() {
   digitalWrite(LED_PIN, LOW);
   
   // give transmitter time to power up
-  delay(100);
+  delay(250);
   
   // set the R counter-divider which does not change
   spi_write(0x00, rCounter);                                 // write R counter-divider (fixed value)

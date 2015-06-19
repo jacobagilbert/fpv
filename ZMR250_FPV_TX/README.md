@@ -1,4 +1,18 @@
-# Custom FPV Transmitter for ZMR250: The ZTX-23
+# Custom FPV Transmitter for ZMR250: The ZTX-23 Version 1.2
+
+I suggest you read this entire README prior to building this, it's not that long and there is valuable information here!
+
+### Version 1.2 Changelog:
+
+The version 1.2 hardware has resolved a few issues and annoyances:
+
+- Addition of LDO to resolve SMPS noise in video
+- Input connector is now a 5-pin picoblade to distinguish from the programming header
+- Changed footprint for 7343 capacitors
+- Switch and LED positions are changed for easier access
+- Requires modification of the Pololu module
+
+The remainder of this guide is for v1.2 only.
 
 ### Origins:
 
@@ -11,18 +25,20 @@ There are a number of differences from the original work, specifically the ATTin
 This project seeks to produce a 200mW FPV transmitter with the following specifications:
 
 - Easily mounted securely on the ZMR250 frame
-- Simple to change channels (no buried DIP switches!!)
+- Low profile and does not inhibit use of 6" propellers
+- Simple to change channels (no buried DIP switches!)
+- Direct 3S/4S power input
 - Has frequency agility supporting all current receiver channels (including IRC's new 'RaceBand'!)
 
-### Current Status:
+### Current System Status Overview:
 
-**ATTiny Firmware:** The current ATTiny firmware has been tested on the hardware platform successfully! There are no known issues with the current software. I have used it many times and overall I am quite pleased. I decreased the startup delay from 1000 to 100 ms recently which speeds up start.
+**ATTiny Firmware:** The current ATTiny firmware has been tested on the hardware platform successfully! There are no known issues with the current software. I have used it many times and overall I am quite pleased. All 5 bands (40 channels total) have been implemented.
 
-**Hardware:** Boards were just received from FAB, they have been populated, tested, and function great. The boards were made through OSHPark and are available [here](https://oshpark.com/shared_projects/drxYzrrf) - $12 for 3 copies. There are a couple changes I will be making for version 1.1 but they are all relatively minor and do not impact . **UPDATE** There are new boards that address the video noise issues that will be available soon. I have ordered an initial set and will update when I test them.
+**Hardware:** The v2.1 boards were just received from FAB and have been populated and tested - they function great. These were made through OSHPark and can be ordered [here](https://oshpark.com/shared_projects/h9UIDucG) - $12 for 3 copies. There are several optional components, which are detailed in a subsequent section.
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
-**Weight:** While reducing weight was not a project objective, 250 racers and their pilots are weight-sensitive. I made some measurements and here is where this board falls in. I was using a TS351 in a neat 3D printed holder, but it was pretty heavy:
+**Weight:** While reducing weight was not a project objective, 250 racers and their pilots are weight-conscious if not sensitive. I made a few measurements and here is how this transmitter measures up. I was previously using a TS351 in a neat 3D printed holder, but it was pretty heavy:
 
 | Hardware     | Weight   | Comments                         |
 |--------------|----------|----------------------------------|
@@ -31,13 +47,9 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 |ZTX-23        |**13.3g** |Includes all mounting and cables! |
 |SMA Extension |7g        |30.7g with BOSCAM and no mounting |
 
-So this transmitter is not the lightest weight transmitter out there, but considering this includes all material required to securely install the transmitter to the frame, I am very pleased.
+So this transmitter is not the lightest transmitter out there, but considering this includes all material required to securely install the transmitter to the frame, I am very pleased.
 
-**Video Quality:** One board I built up looks pretty good, maybe slightly less good than the BOSCAM transmitter I have but great. However, I have recently built up the two other units I planned on and observed quite bad interference coming from the 3.3V regulator. I have added 1uf SMT capacitors on the Pololu output pins and the TX5823 power input pins to help, however this did not completely resolve the issue. I suspect this may be due to the power line running underneath the module so if anyone would like to test this by cutting the power trace and green-wiring it that would be great.
-
-UPDATE: I have confirmed this is due to power supply noise from the 3.3V regulator. Fix is not clear at this point, but I am inclined to replace the 3.3V Pololu module with a 5V module (or modify to output ~3.7V and add a >400mA LDO to 3.3V. Also possible would be to power the VTX from a separate battery. I apologize to anyone who has already ordered boards.
-
-UPDATE2: I have solved the issue on one board by installing a 3.3V LDO inline with the Pololu output, and increasing the Pololu regulator to ~3.9V by installing a 100k resistor in parallel with the base voltage set resistor. It works great now! I am having a second round of boards made with this incorporated onto the board and a few other changes.
+**Video Quality:** The ZTX-23 works really great as-is. I tested bypassing the 3.3V LDO and using the Pololu module output directly, and one module looked good while the other had significant noise. At this point I recommend using the LDO (it's ~$0.50) and making the modification below.
 
 ### Files In Repository:
 
@@ -51,17 +63,22 @@ UPDATE2: I have solved the issue on one board by installing a 3.3V LDO inline wi
 
 BOM is up. There are only a handful of components, but the large capacitors are all 7343 size tantalum, the Pololu module is a 500mA 3.3V SMPS module, R1 is 330 ohm and R2-R4 are 3.3k. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have 'em use 0603 for bypass capacitor and resistors).
 
-### RX5823 Module Modifications:
 
-It is necessary to modify the TX5823 module so it is able to operate in SPI mode. The modification only require the removal of a single resistor, however it is under the metal shield on the module, so you will need to remove that first. The easiest way to do that is to work one side at a time (they are soldered on two sides) with a soldering iron and precision slotted screwdriver. Use the screwdriver between the module board and shield to *gently* apply pressure while melting the solder. If you work carefully, alternating sides, and taking breaks to allow the module to cool down it is fairly easy to remove the shield. Clean up any excess solder, and remove the resistor shown in the following image:
+### Component Modifications:
+
+Both the TX5823 module and Pololu SMPS must be modified before they can be used for this application.
+
+**TX5823 Module Modifications:** It is necessary to modify the TX5823 module so it is able to operate in SPI mode. The modification only require the removal of a single resistor, however it is under the metal shield on the module, so you will need to remove that first. The easiest way to do that is to work one side at a time (they are soldered on two sides) with a soldering iron and precision slotted screwdriver. Use the screwdriver between the module board and shield to *gently* apply pressure while melting the solder. If you work carefully, alternating sides, and taking breaks to allow the module to cool down it is fairly easy to remove the shield. Clean up any excess solder, and remove the resistor shown in the following image:
 
 ![TX5823 Module](pictures/tx5823_SPI_mod.jpg "RX5823 with shield removed")
 
 After removing the resistor, inspect the board (preferrably under a magnifying glass) to ensure you have not accidentally caused any shorts or displaced any other components; replace the shield. This only needs to be done once so you can re-solder the shield to the module PCB.
 
+**Pololu Module Modification:** In order to use the 3.3V LDO, the input must be around 3.6V due to the dropout voltage. This requires a change in the Pololu module, which fortunately is simple - soldering a resistor in parallel with 22.1k R2 on the Pololu module will increase the module output voltage by approximately 350mV and will properly power the LDO. This combination has good efficency on 3S/4S and provides clean power.
+
 ### Mounting Transmitter:
 
-One of the design criteria for this transmitter was mounting to the ZMR250 frame. Consistant with that, it has been designed to mount cleanly to the rear of the top plate, though the hole in the rear must be drilled out with a 0.25" bit to accomodate the SMA connector. By mounting the SMA connector directly to the frame, it is very unlikely that a crash will destroy the transmitter. Be careful drilling carbon fiber as it can be a little tricky, and don't inhale the dust!
+One of the design criteria for this transmitter was mounting natively to the ZMR250 frame. Consistant with that, it has been designed to mount cleanly to the rear of the top plate, though the hole in the rear must be drilled out with a 0.25" bit to accomodate the SMA connector. By mounting the SMA connector directly to the frame, it is very unlikely that a crash will damage the transmitter. Be careful drilling carbon fiber as it can be a little tricky, and don't inhale the dust!
 
 ![Mounting](pictures/fpv_tx_mounted.jpg "Mounting FPV Transmitter")
 
@@ -79,10 +96,13 @@ The transmitter will remember the last channel used and will automatically confi
 
 I think I like this scheme but I'm not sure; it might change. Either way, it's a good start that only requires one button and one LED.
 
-### Video Input Capacitor
+### Optional Components:
 
-The TX5823 module specifies a 470uF capacitor on the video input line. These are rather expensive, and I'm not sure it is strictly necessary so I added pads that can be solder-jumpered to bypass the capacitor. This is hilighted below, I will test both ways and update this with that information.
+**Video Input Capacitor:** The TX5823 module specifies a 470uF capacitor on the video input line (C3). These are rather expensive, and I'm not sure it is strictly necessary so I added pads that can be solder-jumpered to bypass the capacitor. I have tested both with and without this cap, and could not see a difference. I will most likely not purchase these again.
 
-![Video Capacitor Detail](pictures/video_capacitor.png "Video Capacitor Detail")
+**Pololu Module Capacitor:** Pololu recommends the use of a large value capacitor to prevent damage from any turn-on voltage spike. They suggest an input of under 20V with short leads should be fine, but I included the pads anyway. I include them just in case, but like the video input cap, these are fairly expensive. If you do use one, make sure it is rated for the appropriate voltage.
 
-So I have tested with and without the capacitor, and it does not seem to matter. Unfortunately the boards I am building up have other noise issues (see above) making testing difficult, but it doesn't seem to make any difference. It would be good to include it but if cost is an issue, it can be left out.
+**Audio Grounding Resistor:** I included pads for a resistor (R4) that can be used to terminate the audio input, which is no longer connected to the input connector. Feel free to omit this.
+
+**Noise Reduction Capacitor:** The LDO NR capacitor (C6) should only be used with LDOs that require this. The AP2112 I have in the BOM has this pin as a NC and thus C6 should NOT be populated.
+
