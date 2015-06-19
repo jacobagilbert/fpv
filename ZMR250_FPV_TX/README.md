@@ -1,6 +1,6 @@
 # Custom FPV Transmitter for ZMR250: The ZTX-23
 
-I suggest you read this entire README prior to building this, it's not that long and there is valuable information here!
+I suggest you read this entire README prior to building this, it's not that long and there are a few important considerations.
 
 ### Version 1.2 Changelog:
 
@@ -34,7 +34,7 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 **ATTiny Firmware:** The current ATTiny firmware has been tested on the hardware platform successfully! There are no known issues with the current software. I have used it many times and overall I am quite pleased. All 5 bands (40 channels total) have been implemented.
 
-**Hardware:** The v2.1 boards were just received from FAB and have been populated and tested - they function great. These were made through OSHPark and can be ordered [here](https://oshpark.com/shared_projects/h9UIDucG) - $12 for 3 copies. There are several optional components, which are detailed in a subsequent section.
+**Hardware:** The v2.1 boards are in and have been populated and tested - they function great. These were made through OSHPark and can be ordered [here](https://oshpark.com/shared_projects/h9UIDucG) - $12 for 3 copies. There are several optional components, which are detailed in a subsequent section.
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
