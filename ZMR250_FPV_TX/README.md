@@ -1,4 +1,4 @@
-# Custom FPV Transmitter for ZMR250: The ZTX-23 Version 1.2
+# Custom FPV Transmitter for ZMR250: The ZTX-23
 
 I suggest you read this entire README prior to building this, it's not that long and there is valuable information here!
 
@@ -76,6 +76,10 @@ Both the TX5823 module and Pololu SMPS must be modified before they can be used 
 After removing the resistor, inspect the board (preferrably under a magnifying glass) to ensure you have not accidentally caused any shorts or displaced any other components; replace the shield. This only needs to be done once so you can re-solder the shield to the module PCB.
 
 **Pololu Module Modification:** In order to use the 3.3V LDO, the input must be around 3.6V due to the dropout voltage. This requires a change in the Pololu module, which fortunately is simple - soldering a resistor in parallel with 22.1k R2 on the Pololu module will increase the module output voltage by approximately 350mV and will properly power the LDO. This combination has good efficency on 3S/4S and provides clean power.
+
+![Pololu SMPS](pictures/pololu_mod.jpg "Pololu Resistor Change")
+
+The resistor that must be changed by adding another in parallel is shown above, simply solder a ~150k resistor in parallel with it.
 
 ### Mounting Transmitter:
 
