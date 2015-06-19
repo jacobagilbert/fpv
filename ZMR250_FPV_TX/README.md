@@ -40,28 +40,29 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 **Weight:** While reducing weight was not a project objective, 250 racers and their pilots are weight-conscious if not sensitive. I made a few measurements and here is how this transmitter measures up. I was previously using a TS351 in a neat 3D printed holder, but it was pretty heavy:
 
-| Hardware     | Weight   | Comments                         |
-|--------------|----------|----------------------------------|
-|BOSCAM TS351  |23.7g     |Transmitter only, no mounting     |
-|TS5823        |8g        |Transmitter only, no mounting     |
-|ZTX-23        |**13.3g** |Includes all mounting and cables! |
-|SMA Extension |7g        |30.7g with BOSCAM and no mounting |
+| Hardware     | Weight   | Comments                                  |
+|--------------|----------|-------------------------------------------|
+|BOSCAM TS351  |23.7g     |Transmitter only, no mounting hardware     |
+|TS5823        |8g        |Transmitter only, no mounting hardware     |
+|ZTX-23        |**13.3g** |Includes all mounting and cables!          |
+|SMA Extension |7g        |30.7g with BOSCAM and no mounting hardware |
 
 So this transmitter is not the lightest transmitter out there, but considering this includes all material required to securely install the transmitter to the frame, I am very pleased.
 
-**Video Quality:** The ZTX-23 works really great as-is. I tested bypassing the 3.3V LDO and using the Pololu module output directly, and one module looked good while the other had significant noise. At this point I recommend using the LDO (it's ~$0.50) and making the modification below.
+**Video Quality:** The ZTX-23 works really great. I tested bypassing the 3.3V LDO and using the Pololu module output directly, and one module looked okay, while the other had significant noise. With the LDO, crystal clear video. At this point I recommend using the LDO (it's ~$0.50) and making the modification to the Pololu module mentioned below.
 
-### Files In Repository:
+### Repository Structure:
 
-- 5G8_fpv_tx.sch		Eagle PCB schematic for transmitter board
-- 5G8_fpv_tx.brd		Eagle PCB layout for transmitter board
-- ZMR250_FPV_TX.zip		Compressed archive of gerber files for board
-- FPV_TX_BOM.xlsx		Bill of materials to populate boards
+- eagle/			Eagle PCB files
 - attiny/			ATTiny related files and firmware for board
+- FPV_TX_BOM.xlsx		Bill of materials to populate boards
+- ZMR250_FPV_TX_v1.2.zip	Compressed archive of all gerber files
+- README_v1.0.md		Version 1.0 README, out of date but preserved
+- README.md			This README
 
 ### Bill of Materials:
 
-BOM is up. There are only a handful of components, but the large capacitors are all 7343 size tantalum, the Pololu module is a 500mA 3.3V SMPS module, R1 is 330 ohm and R2-R4 are 3.3k. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have 'em use 0603 for bypass capacitor and resistors).
+BOM is up. There are only a handful of components, but the large capacitors are all 7343 size tantalum and the small capacitors are all 0.1uf decoupling caps, the Pololu module is a 500mA 3.3V SMPS, R1 is 330 ohm and R2/R3 are 3.3k. The LDO (U2) is an AP2112 3.3V fixed-output reg. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have 'em use 0603 for bypass capacitor and resistors).
 
 
 ### Component Modifications:
