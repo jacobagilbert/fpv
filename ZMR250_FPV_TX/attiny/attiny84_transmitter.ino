@@ -24,7 +24,7 @@
  *         D13 ----------->> SCK  (9)
  *         GND ------------- GND (14)
  *
- *  This sketch is designed to run with an 8MHz oscillator. Burn appropriate bootloader.
+ *  This sketch is designed to run with an 8MHz oscillator. Burn the appropriate bootloader.
  */
  
 #include <EEPROM.h>
@@ -48,7 +48,7 @@ static const uint16_t channelTable[] PROGMEM = {
     0x610C,    0x6500,    0x68B4,    0x6CA8,    0x709C,    0x7490,    0x7884,    0x7C38,    // Band F / Airwave
     0x510A,    0x5827,    0x5F84,    0x66A1,    0x6DBE,    0x751B,    0x7C38,    0x8395     // Band R / Raceband
 };
-const uint16_t rCounter = 0x0190;    // default value, provides 40kHz frequency resolution
+static const uint16_t rCounter = 0x0190;    // default value, provides 40kHz frequency resolution
 
 /* Frequency mapping for channelTable (values in MHz):
  *   CH 1       CH 2       CH 3       CH 4       CH 5       CH 6       CH 7       CH 8
@@ -62,6 +62,7 @@ const uint16_t rCounter = 0x0190;    // default value, provides 40kHz frequency 
 enum STATE { WAITING, HOLDOFF, SHOW_FREQ, RELEASE_TIMER, BAND_COUNTING, CHANNEL_COUNTING, SET_FREQ } current_state;
 uint16_t count;
 uint8_t current_freq, previous_val, band, channel;
+uint8_t n_ctr = 0;
 
 void setup() {
   
@@ -79,14 +80,21 @@ void setup() {
   
   // LED is OFF by default
   digitalWrite(LED_PIN, LOW);
-  
-  // give transmitter time to power up
-  delay(250);
-  
-  // set the R counter-divider which does not change
-  spi_write(0x00, rCounter);                                 // write R counter-divider (fixed value)
-  // read previous channel and set module
+
+  // read previous channel from EEPROM
   current_freq = EEPROM.read(EEPROM_ADDR_LAST_FREQ) & 0x3f;  // mask by 0b0011.1111 = 0b xx xx B2 B1 . B0 C2 C1 C0
+
+  // give transmitter time to power up before setting frequency
+  delay(100);
+
+  // set the frequency on the module
+  set_5823_freq(current_freq);
+  
+  // now do that 3 more times to make sure it took - we could wait longer but want to minimize
+  // any interference we might be caused by us powering up to the default frequency
+  delay(100);
+  set_5823_freq(current_freq);
+  delay(100);
   set_5823_freq(current_freq);
   
   //flash current frequency to user on boot
@@ -105,6 +113,14 @@ void loop() {
       if (button_read(10)) {
         current_state = HOLDOFF;
         count = 0;
+      } else {
+        // LED heartbeat
+        if ((n_ctr > 0xc0) && ((n_ctr & 0x1f) > 0x18)) {
+          digitalWrite(LED_PIN, HIGH);
+        } else {
+          digitalWrite(LED_PIN, LOW);
+        }
+        n_ctr++;
       }
       break;
       
@@ -332,8 +348,8 @@ void set_5823_freq(uint8_t freq)
     // read in the channel information from the table, and add 0x00 04 00 00 to it
     channelData = (pgm_read_word_near(channelTable + freq)) + 0x00040000;
     
-    // Do we actually need to set register 0x00??
-    //spi_write(0x00, rCounter);      // write R counter-divider (fixed value)
+    // Setting the R-Counter is not necessary every time but doesn't hurt
+    spi_write(0x00, rCounter);      // write R counter-divider (fixed value)
     spi_write(0x01, channelData);   // write N and A counter-dividers (from channel table)
   }
 }
