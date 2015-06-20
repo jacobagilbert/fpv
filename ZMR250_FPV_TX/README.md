@@ -1,5 +1,7 @@
 # Custom FPV Transmitter for ZMR250: The ZTX-23
 
+![ZMR250 Top View](pictures/top_view.png "ZMR250 Top View")
+
 I suggest you read this entire README prior to building this, it's not that long and there are a few important considerations.
 
 ### Version 1.2 Changelog:
@@ -85,11 +87,17 @@ The resistor that must be changed by adding another in parallel is shown above, 
 
 One of the design criteria for this transmitter was mounting natively to the ZMR250 frame. Consistant with that, it has been designed to mount cleanly to the rear of the top plate, though the hole in the rear must be drilled out with a 0.25" bit to accomodate the SMA connector. By mounting the SMA connector directly to the frame, it is very unlikely that a crash will damage the transmitter. Be careful drilling carbon fiber as it can be a little tricky, and don't inhale the dust!
 
-![Mounting](pictures/fpv_tx_mounted.jpg "Mounting FPV Transmitter")
+![TX Mounted](pictures/tx_on_top_plate.png "Transmitter on top plate")
 
 On the other end from the SMA connector are two slots that will nicely fit M3 nylon hardware. A spacer is needed to keep some standoff from the conductive frame. I used the smallest diameter HQ propeller mounting bushings since they were a pretty good fit but I'll probably 3D print some spacers that are sized better and post the files when I am happy.
 
-### Transmitter Operation
+![Mounting](pictures/fpv_tx_mounted.png "Mounting FPV Transmitter")
+
+### Connectors:
+
+There are two connectors on the board, a 5 pin Molex PicoBlade PTH connector for power and video input, and a 6 pin PicoBlade PTH connector for programming. I recommend populating only the 5 pin input connector so they are not confused when conecting hardware. To program the microcontroller, I bend the pins slightly on the 6 pin header so they press-fit securely and remove the connector when I am through.
+
+### Transmitter Operation:
 
 The transmitter will remember the last channel used and will automatically configure to this channel on startup. To view the current frequency, you can push the button once quickly and the LED will flash the current band (1-5) followed by a brief pause, followed by the current channel (1-8). To change the frequency, the following procedure should be used:
 

@@ -21,3 +21,5 @@ This is what I do to program: connect RST, MOSI, MISO, SCK, and GND from connect
 The RTC6705 RFIC has two 20-bit registers that control the frequency synthesizer, 0x00 and 0x01. The 0x00 (Synthesizer Register A) register contains the R-counter divider in the low 15 bits. The 0x01 register contains the N-counter divider in the upper 13 bits and the A-counter divider in the lower 7 bits.
 
 The default R-counter divider value (0x190 = 400d) provides for 40kHz tuning resolution, which is more than sufficient, so it is not changed. The values for the 0x01 register for each channel are pre-calculated and stored in PROGMEM. These values were derived from the equations in the TX_Channel_Calculator spreadsheet.
+
+At initial turn-on, the registers are set a couple of times after varying delay. This is to reduce the amount of interference the default settings might cause. 100ms delay proved too short to reliably tune the TX chip, so we attempt to tune it to the last known frequency several times after 100ms, 300ms, and 500ms.
