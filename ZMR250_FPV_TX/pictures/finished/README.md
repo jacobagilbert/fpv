@@ -1,4 +1,4 @@
-# PREVIEW:
+### IMAGE PREVIEW:
 
 ![1](finished1.png)
 ![2](finished2.png)
