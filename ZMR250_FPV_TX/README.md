@@ -40,6 +40,8 @@ This project seeks to produce a 200mW FPV transmitter with the following specifi
 
 ![ZMR250 PCB Front](pictures/zmr250_board_v1_front.png "ZMR250 PCB Front")
 
+The RF path is a properly dimensioned CPWG transmission line, and while just at the length where it begins to matter (and it's FR4 at 5.8 GHz...), I figured it would be fun to do it properly. The trace is 55 mils wide with 9 mil spacing on 1.6 mm FR4, so the line has an impedance of between 49 and 51 ohms depending on the dielectric constant (I assume it's somewhere between 4.3 and 4.6 which should be reasonable).
+
 **Weight:** While reducing weight was not a project objective, 250 racers and their pilots are weight-conscious if not sensitive. I made a few measurements and here is how this transmitter measures up. I was previously using a TS351 in a neat 3D printed holder, but it was pretty heavy:
 
 | Hardware     | Weight   | Comments                                  |
@@ -64,24 +66,28 @@ So this transmitter is not the lightest transmitter out there, but considering t
 
 ### Bill of Materials:
 
-BOM is up. There are only a handful of components, but the large capacitors are all 7343 size tantalum and the small capacitors are all 0.1uf decoupling caps, the Pololu module is a 500mA 3.3V SMPS, R1 is 330 ohm and R2/R3 are 3.3k. The LDO (U2) is an AP2112 3.3V fixed-output reg. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have 'em use 0603 for bypass capacitor and resistors).
+BOM is up. There are only a handful of components, but the large capacitors are all 7343 size tantalum and the small capacitors are all 0.1uf decoupling caps, the Pololu module is a 500mA 3.3V SMPS, R1 is 330 ohm and R2/R3 are 3.3k. The LDO (U2) is an AP2112 3.3V fixed-output reg. All the small passives are 0805 (however SparkFun's 0805 footprint is a little tight... If you have them, use 0603 for bypass capacitor and resistors).
 
 
 ### Component Modifications:
 
 Both the TX5823 module and Pololu SMPS must be modified before they can be used for this application.
 
-**TX5823 Module Modifications:** It is necessary to modify the TX5823 module so it is able to operate in SPI mode. The modification only require the removal of a single resistor, however it is under the metal shield on the module, so you will need to remove that first. The easiest way to do that is to work one side at a time (they are soldered on two sides) with a soldering iron and precision slotted screwdriver. Use the screwdriver between the module board and shield to *gently* apply pressure while melting the solder. If you work carefully, alternating sides, and taking breaks to allow the module to cool down it is fairly easy to remove the shield. Clean up any excess solder, and remove the resistor shown in the following image:
+**TX5823 Module Modifications:** It is necessary to modify the TX5823 module so it is able to operate in SPI mode. The modification only require the removal of a single resistor, however it is under the metal shield on the module so you will need to remove that first. This information is available in either the datasheet of the RTC6705 chip.
+
+The easiest way to make the modification is to work one side at a time (they are soldered on two sides) with a soldering iron and precision slotted screwdriver. Use the screwdriver between the module board and shield to *gently* apply pressure while melting the solder. If you work carefully, alternating sides, and taking breaks to allow the module to cool down it is fairly easy to remove the shield. Clean up any excess solder, and remove the resistor shown in the following image:
 
 ![TX5823 Module](pictures/tx5823_SPI_mod.jpg "RX5823 with shield removed")
 
 After removing the resistor, inspect the board (preferrably under a magnifying glass) to ensure you have not accidentally caused any shorts or displaced any other components; replace the shield. This only needs to be done once so you can re-solder the shield to the module PCB.
 
+More information regarding SPI mode operation is available in the limited datasheet, and under the 'attiny' directory.
+
 **Pololu Module Modification:** In order to use the 3.3V LDO, the input must be around 3.6V due to the dropout voltage. This requires a change in the Pololu module, which fortunately is simple - soldering a resistor in parallel with 22.1k R2 on the Pololu module will increase the module output voltage by approximately 350mV and will properly power the LDO. This combination has good efficency on 3S/4S and provides clean power.
 
 ![Pololu SMPS](pictures/pololu_mod.jpg "Pololu Resistor Change")
 
-The resistor that must be changed by adding another in parallel is shown above, simply solder a ~150k resistor in parallel with it.
+The resistor that must be changed by adding another in parallel is shown above, simply solder a ~150k resistor in parallel with it. This value can be deterined from the datasheet for the SMPS controller used, available from Pololu.
 
 ### Mounting Transmitter:
 
